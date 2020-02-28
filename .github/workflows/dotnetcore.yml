@@ -19,6 +19,9 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+    - name: Restore
+      run: dotnet restore --force
+
     - name: Build
       run: dotnet build --configuration Release
       
