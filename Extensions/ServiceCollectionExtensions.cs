@@ -16,6 +16,9 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddHealthCheckPublisher(this IServiceCollection services, Func<IHealthBuilder, IHealthBuilder>? additional = null)
         {
+            services.TryAddSingleton<ICpuUsageMonitor, CpuUsageMonitor>();
+            services.AddHostedService(sp => (CpuUsageMonitor) sp.GetRequiredService<ICpuUsageMonitor>());
+
             services.AddSingleton<HealthCheck, CpuHealthCheck>();
 
             var builder = new HealthBuilder()
@@ -23,9 +26,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .OutputHealth.Using(new HealthStatusJsonOutputFormatter());
             builder = additional?.Invoke(builder) ?? builder;
             builder.BuildAndAddTo(services);
-
-            services.TryAddSingleton<ICpuUsageMonitor, CpuUsageMonitor>();
-            services.AddHostedService(sp => (CpuUsageMonitor) sp.GetRequiredService<ICpuUsageMonitor>());
 
             return services;
         }
